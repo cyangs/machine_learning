@@ -45,9 +45,9 @@ if __name__ == '__main__':
     print("Loading data")
     print("----------")
     ds1_details = {
-            'data': loader.OkCupidProfileData(verbose=verbose, seed=seed),
-            'name': 'ok_cupid_profiles',
-            'readable_name': 'OkC Profiles',
+            'data': loader.KeplerData(verbose=verbose, seed=seed),
+            'name': 'kepler_data',
+            'readable_name': 'Kepler Data',
         }
     ds2_details = {
             'data': loader.AviationCrashesData(verbose=verbose, seed=seed),
@@ -67,8 +67,8 @@ if __name__ == '__main__':
     timings = {}
 
     datasets = [
-        # ds1_details,
-        ds2_details
+        ds1_details
+        # ds2_details
     ]
 
     experiment_details = []

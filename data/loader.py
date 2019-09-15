@@ -310,15 +310,15 @@ class AviationCrashesData(DataLoader):
         return train_features, train_classes
 
 
-class OkCupidProfileData(DataLoader):
-    def __init__(self, path='data/profiles.csv', verbose=False, seed=1):
+class KeplerData(DataLoader):
+    def __init__(self, path='data/kepler.csv', verbose=False, seed=1):
         super().__init__(path, verbose, seed)
 
     def _load_data(self):
         self._data = pd.read_csv(self._path, header=None)
 
     def data_name(self):
-        return 'OkCupidProfileData'
+        return 'KeplerData'
 
     def class_column_name(self):
         return '8'
@@ -418,7 +418,7 @@ class StatlogVehicleData(DataLoader):
 
 
 if __name__ == '__main__':
-    cd_data = OkCupidProfileData(verbose=True)
+    cd_data = KeplerData(verbose=True)
     cd_data.load_and_process()
     # cd_data = CreditDefaultData(verbose=True)
     # cd_data.load_and_process()
