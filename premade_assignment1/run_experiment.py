@@ -44,17 +44,21 @@ if __name__ == '__main__':
 
     print("Loading data")
     print("----------")
-
     ds1_details = {
-            'data': loader.CreditDefaultData(verbose=verbose, seed=seed),
-            'name': 'credit_default',
-            'readable_name': 'Credit Default',
+            'data': loader.OkCupidProfileData(verbose=verbose, seed=seed),
+            'name': 'ok_cupid_profiles',
+            'readable_name': 'OkC Profiles',
         }
     ds2_details = {
-            'data': loader.PenDigitData(verbose=verbose, seed=seed),
-            'name': 'pen_digits',
-            'readable_name': 'Handwritten Digits',
+            'data': loader.AviationCrashesData(verbose=verbose, seed=seed),
+            'name': 'aviation_crashes',
+            'readable_name': 'Aviation Crashes',
         }
+    # ds2_details = {
+    #         'data': loader.PenDigitData(verbose=verbose, seed=seed),
+    #         'name': 'pen_digits',
+    #         'readable_name': 'Handwritten Digits',
+    #     }
 
     if verbose:
         print("----------")
@@ -63,7 +67,7 @@ if __name__ == '__main__':
     timings = {}
 
     datasets = [
-        ds1_details,
+        # ds1_details,
         ds2_details
     ]
 
