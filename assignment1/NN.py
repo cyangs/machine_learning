@@ -1,52 +1,129 @@
-
 import pandas as pd
-from sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report,confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.pipeline import Pipeline
+import sklearn.model_selection as ms
+
 
 class NeuralNetwork:
 
     def testRun(self):
         return NotImplementedError
 
-    def keplerData(self):
-        df = pd.read_csv("../data/kepler.csv")
-        non_floats = []
-
-        # drop all columns who are not float
-        for col in df:
-            if df[col].dtypes != "float64":
-                non_floats.append(col)
-        df = df.drop(columns=non_floats)
-
-        # replace all NaN with 0
-        df = df.fillna(0)
-
+    def keplerData(self, kepler_df):
         # koi_score is output variables (that we need to predict)
-        y = df['koi_score']
-        X = df
+        y = kepler_df['koi_score']
+        X = kepler_df
         del X['koi_score']  # delete from X we don't need it
 
         # X = X._get_numeric_data
-        print(X, y)
+        # print(X, y)
 
         # divide X and y into train and test | train on different data | test on different -> good matrix
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
-        mlp = MLPClassifier(hidden_layer_sizes=(13, 13, 13), max_iter=500)
+        mlp = MLPRegressor(hidden_layer_sizes=(13, 13, 13), max_iter=500)
         mlp.fit(X_train, y_train)
 
-        predictions = mlp.predict(X_test)
+        score = mlp.score(X_test, y_test)
+        print("[*] Accuracy: ", score)
 
-        print(confusion_matrix(y_test, predictions))
+        # not work on continous data that we have as in Kepler
+        # print(confusion_matrix(y_test, predictions))
+        # print(classification_report(y_test, predictions))
 
-        print(classification_report(y_test, predictions))
+    def insuranceData(self, insurance_df):
+        y = insurance_df['Destination']
+        X = insurance_df
+        del X['Destination']  # delete from X we don't need it
 
-    def __init__(self, test=True, verbose=True):
-        self.verbose = verbose
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
-        if test:
-            return NotImplementedError
-        else:
-            print("Production Run, using Kepler data set")
-            self.keplerData()
+        alphas = [2., 4.]
+        hiddens = [(h,) * l for l in [1, 2, 3] for h in [4, 4 // 2, 4 * 2]]
+        hiddens += [(32,), (64,), (16,), (100, 100, 100), (60, 60, 60)]
+
+        params = {
+            'MLP__solver': ['lbfgs', 'adam'],
+            'MLP__alpha': alphas,
+            'MLP__hidden_layer_sizes': hiddens,
+            'MLP__random_state': [1],
+            'MLP__activation': ['identity', 'relu']
+        }
+
+        learner = Pipeline([('MLP', MLPRegressor(max_iter=1000))])
+        gs = ms.GridSearchCV(
+            learner,
+            params,
+            cv=3, n_jobs=2, scoring=None,
+            refit='neg_mean_squared_error',
+            return_train_score=True, verbose=10
+        )
+
+        gs.fit(X_train, y_train)
+        params = gs.best_params_
+
+        model = gs.best_estimator_
+        model.set_params(**params)
+
+        print("[*] Learned parameters: {}".format(params))
+        model.fit(X_train, y_train)
+
+        return model.score(X_test, y_test)
+
+
+    def kelperDataBetterModel(self, kepler_df):
+
+        y = kepler_df['koi_score']
+        X = kepler_df
+        del X['koi_score']  # delete from X we don't need it
+
+        # X = X._get_numeric_data
+        # print(X, y)
+
+        # divide X and y into train and test | train on different data | test on different -> good matrix
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+
+        alphas = [2., 4.]
+        hiddens = [(h,) * l for l in [1, 2, 3] for h in [4, 4 // 2, 4 * 2]]
+        hiddens += [(32,), (64,), (16,), (100, 100, 100), (60, 60, 60)]
+
+        params = {
+            'MLP__solver': ['lbfgs', 'adam'],
+            'MLP__alpha': alphas,
+            'MLP__hidden_layer_sizes': hiddens,
+            'MLP__random_state': [1],
+            'MLP__activation': ['identity', 'relu']
+        }
+
+        learner = Pipeline([('MLP', MLPRegressor(max_iter=1000))])
+        gs = ms.GridSearchCV(
+            learner,
+            params,
+            cv=3, n_jobs=2, scoring=None,
+            refit='neg_mean_squared_error',
+            return_train_score=True, verbose=10
+        )
+
+        gs.fit(X_train, y_train)
+        params = gs.best_params_
+
+        model = gs.best_estimator_
+        model.set_params(**params)
+
+        print("[*] Learned parameters: {}".format(params))
+        model.fit(X_train, y_train)
+
+        return model.score(X_test, y_test)
+
+    def get_results(self):
+        print("[*] NN - Kepler Data Accuracy: {}".format(self.kepler_accuracy))
+        print("[*] NN - Insurance Data Accuracy: {}".format(self.insurance_accuracy))
+
+    def __init__(self, kepler_df, insurance_df):
+        print("Neural Network, using Kepler/Insurance data set")
+        self.kepler_accuracy = self.kelperDataBetterModel(kepler_df)
+        self.insurance_accuracy = self.insuranceData(insurance_df)
+        self.get_results()
+

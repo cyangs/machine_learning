@@ -1,4 +1,5 @@
 import pandas as pd
+from assignment1 import exp_runner
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
@@ -31,23 +32,38 @@ class DecisionTree:
         print(f"The first sample most likely belongs a {iris.target_names[sample_one_pred]} flower.")
         print(f"The second sample most likely belongs a {iris.target_names[sample_two_pred]} flower.")
 
-    def keplerData(self):
-        # read csv file | df is dataframe (object of pandas module)
-        df = pd.read_csv("../data/kepler.csv")
-        non_floats = []
+    def insuranceData(self, insurance_df):
+        # Destination is output variables (that we need to predict)
+        y = insurance_df['Destination']
+        X = insurance_df
+        del X['Destination']  # delete from X we don't need it
 
-        # drop all columns who are not float
-        for col in df:
-            if df[col].dtypes != "float64":
-                non_floats.append(col)
-        df = df.drop(columns=non_floats)
+        # X = X._get_numeric_data
+        print(X, y)
 
-        # replace all NaN with 0
-        df = df.fillna(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+        # test_size = 0.25: Means 25% data is in test and 75% in train (you can try to vary it)
 
+        # regressor because output variable is not 0 or 1 but continous
+        model = tree.DecisionTreeRegressor(criterion="mse",
+                                           splitter="best",
+                                           max_depth=None,
+                                           min_samples_split=2,
+                                           min_samples_leaf=1,
+                                           max_features=None,
+                                           max_leaf_nodes=None)
+
+        # training
+        model.fit(X_train, y_train)
+
+        # accuracy
+        accuracy = model.score(X_test, y_test)
+        return accuracy
+
+    def keplerData(self, kepler_df):
         # koi_score is output variables (that we need to predict)
-        y = df['koi_score']
-        X = df
+        y = kepler_df['koi_score']
+        X = kepler_df
         del X['koi_score']  # delete from X we don't need it
 
         # X = X._get_numeric_data
@@ -70,14 +86,17 @@ class DecisionTree:
         model.fit(X_train, y_train)
 
         # accuracy
-        accuracy = model.score(X_test, y_test)
-        print("[*] Accuracy: {}".format(accuracy))
+        return model.score(X_test, y_test)
 
-    def __init__(self, test = True):
-        if test:
-            print("Test run, using default Iris data set")
-            self.testRunWithIrisData()
-        else:
-            print("Production Run, using Kepler data set")
-            self.keplerData()
+    def get_results(self):
+        print("[*] DT - Kepler Data Accuracy: {}".format(self.kepler_accuracy))
+        print("[*] DT - Insurance Data Accuracy: {}".format(self.insurance_accuracy))
+
+    def __init__(self):
+        print("Decision Tree, using Kepler/Insurance data set")
+        self.kepler_accuracy = self.keplerData(exp_runner.get_kepler_train_test_data())
+        self.insurance_accuracy = self.insuranceData(exp_runner.get_insurance_train_test_data())
+        self.get_results()
+
+
 
