@@ -64,7 +64,6 @@ class DataLoader(ABC):
         """
         Load data from the given path and perform any initial processing required. This will populate the
         features and classes and should be called before any processing is done.
-
         :return: Nothing
         """
         if data is not None:
@@ -290,46 +289,6 @@ class PenDigitData(DataLoader):
         return train_features, train_classes
 
 
-class AviationCrashesData(DataLoader):
-    def __init__(self, path='data/aviation_crashes.csv', verbose=False, seed=1):
-        super().__init__(path, verbose, seed)
-
-    def _load_data(self):
-        self._data = pd.read_csv(self._path, header=None)
-
-    def data_name(self):
-        return 'AviationCrashes'
-
-    def class_column_name(self):
-        return '8'
-
-    def _preprocess_data(self):
-        pass
-
-    def pre_training_adjustment(self, train_features, train_classes):
-        return train_features, train_classes
-
-
-class KeplerData(DataLoader):
-    def __init__(self, path='data/kepler.csv', verbose=False, seed=1):
-        super().__init__(path, verbose, seed)
-
-    def _load_data(self):
-        self._data = pd.read_csv(self._path, header=None)
-
-    def data_name(self):
-        return 'KeplerData'
-
-    def class_column_name(self):
-        return '8'
-
-    def _preprocess_data(self):
-        pass
-
-    def pre_training_adjustment(self, train_features, train_classes):
-        return train_features, train_classes
-
-
 class AbaloneData(DataLoader):
     def __init__(self, path='data/abalone.data', verbose=False, seed=1):
         super().__init__(path, verbose, seed)
@@ -418,10 +377,8 @@ class StatlogVehicleData(DataLoader):
 
 
 if __name__ == '__main__':
-    cd_data = KeplerData(verbose=True)
+    cd_data = CreditDefaultData(verbose=True)
     cd_data.load_and_process()
-    # cd_data = CreditDefaultData(verbose=True)
-    # cd_data.load_and_process()
-    #
-    # ca_data = CreditApprovalData(verbose=True)
-    # ca_data.load_and_process()
+
+    ca_data = CreditApprovalData(verbose=True)
+    ca_data.load_and_process()

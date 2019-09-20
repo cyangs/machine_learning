@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.pipeline import Pipeline
 import sklearn.model_selection as ms
-
+from assignment1 import exp_runner
 
 class NeuralNetwork:
 
@@ -121,9 +121,9 @@ class NeuralNetwork:
         print("[*] NN - Kepler Data Accuracy: {}".format(self.kepler_accuracy))
         print("[*] NN - Insurance Data Accuracy: {}".format(self.insurance_accuracy))
 
-    def __init__(self, kepler_df, insurance_df):
+    def __init__(self):
         print("Neural Network, using Kepler/Insurance data set")
-        self.kepler_accuracy = self.kelperDataBetterModel(kepler_df)
-        self.insurance_accuracy = self.insuranceData(insurance_df)
+        self.kepler_accuracy = self.kelperDataBetterModel(exp_runner.get_kepler_train_test_data())
+        self.insurance_accuracy = self.insuranceData(exp_runner.get_insurance_train_test_data())
         self.get_results()
 
