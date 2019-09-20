@@ -75,24 +75,29 @@ if __name__ == '__main__':
     print("Initializing Models...")
 
     # runs the Decision Tree
-    dtRunner = DT.DecisionTree()
+    # dtRunner = DT.DecisionTree()
 
     # runs the K-Nearest Neighbor
-    kNNRunner = KNN.KNearestNeighbor()
+    kNNRunner = KNN.KNearestNeighbor(50)
+    kNNRunner.plot_data()
     #
     # runs the Support Vector Machine
     # SVMRunner = SVM.SupportVectorMachine(kepler_df, insurance_df)
     #
     # runs the Boosting
-    BoostRunner = BOOST.Boosting()
+    # BoostRunner = BOOST.Boosting()
 
     # runs the Neural Network
     # nnRunner = NN.NeuralNetwork()
+    #
+    # print(">>>>>>>>>>>>>>>>>>>>>>")
+    # dtRunner.get_results()
+    # print(">>>>>>>>>>>>>>>>>>>>>>")
+    # kNNRunner.get_results()
+    # print(">>>>>>>>>>>>>>>>>>>>>>")
+    # BoostRunner.get_results()
+    # print(">>>>>>>>>>>>>>>>>>>>>>")
+    # nnRunner.get_results()
+    # print(">>>>>>>>>>>>>>>>>>>>>>")
 
-    print(">>>>>>>>>>>>>>>>>>>>>>")
-    dtRunner.get_results()
-    print(">>>>>>>>>>>>>>>>>>>>>>")
-    kNNRunner.get_results()
-    print(">>>>>>>>>>>>>>>>>>>>>>")
-    BoostRunner.get_results()
-    print(">>>>>>>>>>>>>>>>>>>>>>")
+

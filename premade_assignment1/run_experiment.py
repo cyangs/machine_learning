@@ -39,26 +39,22 @@ if __name__ == '__main__':
 
     seed = args.seed
     if seed is None:
-        seed = np.random.randint(0, (2 ** 32) - 1)
+        seed = np.random.randint(0, (2 ** 32) - 1, dtype='uint64')
         print("Using seed {}".format(seed))
 
     print("Loading data")
     print("----------")
+
     ds1_details = {
-            'data': loader.KeplerData(verbose=verbose, seed=seed),
-            'name': 'kepler_data',
-            'readable_name': 'Kepler Data',
+            'data': loader.CreditDefaultData(verbose=verbose, seed=seed),
+            'name': 'credit_default',
+            'readable_name': 'Credit Default',
         }
     ds2_details = {
-            'data': loader.AviationCrashesData(verbose=verbose, seed=seed),
-            'name': 'aviation_crashes',
-            'readable_name': 'Aviation Crashes',
+            'data': loader.PenDigitData(verbose=verbose, seed=seed),
+            'name': 'pen_digits',
+            'readable_name': 'Handwritten Digits',
         }
-    # ds2_details = {
-    #         'data': loader.PenDigitData(verbose=verbose, seed=seed),
-    #         'name': 'pen_digits',
-    #         'readable_name': 'Handwritten Digits',
-    #     }
 
     if verbose:
         print("----------")
@@ -67,8 +63,8 @@ if __name__ == '__main__':
     timings = {}
 
     datasets = [
-        ds1_details
-        # ds2_details
+        ds1_details,
+        ds2_details
     ]
 
     experiment_details = []
