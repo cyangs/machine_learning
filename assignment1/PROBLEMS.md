@@ -23,3 +23,32 @@ travel_insurance.csv is good.
 
 It also have string columns, where values of columns are in numeric form.
 There you have to encode the column strings in to numeric: Like a mapping where YES->1, NO->0: After that all of the models can be used, get it? This is called data-preprocessing of converting categorical data in numerical data, this is a good practice you should look it up, and then ask me if any doubts.
+
+So, 1 big mistake that is making all the difference, which I figured out in the next 5 min is that you are actually trying to classify a discrete number of classes (possible Destinations)
+this is a classifier problem
+But you are using regression everywhere, just opposite to the last mistake you made.
+
+classification vs regression. 
+
+I, then went ahead and saw that you are training your model using only 4-5 columns (as rest are categorical.)
+should i have more
+I then converted all the columns into numeric, be it category or else.
+Yes.
+I used all columns of insurance dataset.
+
+The destination that you are trying to predict is not well-correlated with other features so it can't get past 40 or so.
+
+I tried to predict Age on this dataset: 50% accuracy.
+I predicted Gender: 90% accuracy.
+
+But destination labels are too much, but not much data.
+Yes.
+Ok.
+I''ve uploaded the two files that I've changed here.
+
+
+- I have changed preprocessing of insurance dataset
+- And added and changed model in DT file, in insurance function
+This classifier problem must be coming in rest of the models,
+so you should use classifier in rest of the files.
+Too, that would give right results (not accurate but right)

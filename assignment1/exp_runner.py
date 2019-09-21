@@ -41,31 +41,44 @@ def get_kepler_train_test_data():
 
     return df_copy
 
+# def get_insurance_train_test_data():
+#     df = pd.read_csv("../data/travel_insurance.csv")
+#     df_copy = df.copy()
+#
+#     non_floats = []
+#
+#     countries = df['Destination'].astype('category').cat.categories.tolist()
+#     replace_countries = {'Destination': {k: v for k, v in zip(countries, list(range(1, len(countries) + 1)))}}
+#     df_copy.replace(replace_countries, inplace=True)
+#
+#     boolean_claim_replace = {'Claim': {'Yes': 0, 'No': 1}}
+#     # boolean_gender_replace = { 'Gender' : { 'F' : 0, 'M' : 1, 'nan': 2}}
+#
+#     df_copy.replace(boolean_claim_replace, inplace=True)
+#     df_copy.drop('Gender', axis=1, inplace=True)
+#
+#     # drop all columns who are not float
+#     for col in df_copy:
+#         if df_copy[col].dtypes != "float64":
+#             if df_copy[col].dtypes == "int64":
+#                 df_copy[col] = df_copy[col].astype(np.float64)
+#             else:
+#                 non_floats.append(col)
+#
+#     df_copy = df_copy.drop(columns=non_floats)
+#     df_copy = df_copy.fillna(0)
+#
+#     return df_copy
+
+
 def get_insurance_train_test_data():
-    df = pd.read_csv("../data/travel_insurance.csv")
-    df_copy = df.copy()
+    df_copy = pd.read_csv("../data/travel_insurance.csv")
 
-    non_floats = []
+    col_list = df_copy.columns
+    for col in col_list:
+        if df_copy[col].dtype == 'O':
+            df_copy[col] = df_copy[col].astype('category').cat.codes
 
-    countries = df['Destination'].astype('category').cat.categories.tolist()
-    replace_countries = {'Destination': {k: v for k, v in zip(countries, list(range(1, len(countries) + 1)))}}
-    df_copy.replace(replace_countries, inplace=True)
-
-    boolean_claim_replace = {'Claim': {'Yes': 0, 'No': 1}}
-    # boolean_gender_replace = { 'Gender' : { 'F' : 0, 'M' : 1, 'nan': 2}}
-
-    df_copy.replace(boolean_claim_replace, inplace=True)
-    df_copy.drop('Gender', axis=1, inplace=True)
-
-    # drop all columns who are not float
-    for col in df_copy:
-        if df_copy[col].dtypes != "float64":
-            if df_copy[col].dtypes == "int64":
-                df_copy[col] = df_copy[col].astype(np.float64)
-            else:
-                non_floats.append(col)
-
-    df_copy = df_copy.drop(columns=non_floats)
     df_copy = df_copy.fillna(0)
 
     return df_copy
@@ -75,6 +88,9 @@ def plot_boost_model(kep_df, ins_df, variance = 'n_estimators'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
     ax = plt.gca()
+    plt.title("Boosting")
+    plt.xlabel("Number of Runs")
+    plt.ylabel("Accuracy")
     kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
     ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
     plt.savefig(f'./output/BOOST_graph_{variance}_{timestamp}.png')
@@ -84,33 +100,62 @@ def plot_kNN_model(kep_df, ins_df, variance = 'n_neighbors'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
     ax = plt.gca()
+    plt.title("k-Nearest Neighbor")
+    plt.xlabel("Number of Runs")
+    plt.ylabel("Accuracy")
     kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
     ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
     plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
     plt.clf()
 
-def plot_DT_model():
+def plot_DT_model(kep_df, ins_df, variance = 'max_depth'):
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Data...")
+    ax = plt.gca()
+    plt.title("Decision Tree")
+    plt.xlabel("Number of Runs")
+    plt.ylabel("Accuracy")
+    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
+    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    plt.savefig(f'./output/DT_graph_{variance}_{timestamp}.png')
+    plt.clf()
+
+def plot_SVM_model(df, dataname):
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Data...")
+
+    plt.title("Support Vector Machine")
+    df.plot.bar(rot=0)
+    plt.xlabel("Kernels")
+    plt.ylabel("Accuracy")
+    plt.savefig(f'./output/SVM_Graph_{timestamp}.png')
+    plt.clf()
+
 
 if __name__ == '__main__':
     print("Initializing Models...")
 
     # runs the Decision Tree
-    dtRunner = DT.DecisionTree()
-    plot_DT_model()
-    #
-    # # runs the K-Nearest Neighbor
-    kNNRunner = KNN.KNearestNeighbor(50)
-    plot_kNN_model(kNNRunner.get_kepler_results(), kNNRunner.get_insurance_results())
-    # # #
-    # # runs the Support Vector Machine
-    # SVMRunner = SVM.SupportVectorMachine()
+    # dtRunner = DT.DecisionTree(30)
+    # plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
     # #
-    # runs the Boosting
-    boostModel = BOOST.Boosting(50)
-    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+    # # # runs the K-Nearest Neighbor
+    # kNNRunner = KNN.KNearestNeighbor(50)
+    # plot_kNN_model(kNNRunner.get_kepler_results(), kNNRunner.get_insurance_results())
+    # # # # #
+    # runs the Support Vector Machine
+    SVMRunner = SVM.SupportVectorMachine()
+    plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
+    plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
 
-    boostModel = BOOST.Boosting(50, "learning_rate")
-    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+    # # # #
+    # # # runs the Boosting
+    # boostModel = BOOST.Boosting(50)
+    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+    #
+    # boostModel = BOOST.Boosting(50, 'learning_rate')
+    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+
 
     # runs the Neural Network
     # nnRunner = NN.NeuralNetwork()
