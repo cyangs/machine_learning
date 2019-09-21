@@ -6,7 +6,8 @@ from assignment1 import NN
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
-import time
+import datetime
+import matplotlib.pyplot as plt
 
 def get_kepler_train_test_data():
     df = pd.read_csv("../data/kepler.csv")
@@ -70,34 +71,47 @@ def get_insurance_train_test_data():
     return df_copy
 
 
-if __name__ == '__main__':
+def plot_boost_model(kep_df, ins_df, variance = 'n_estimators'):
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Data...")
+    ax = plt.gca()
+    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
+    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    plt.savefig(f'./output/BOOST_graph_{variance}_{timestamp}.png')
+    plt.clf()
 
+def plot_kNN_model(kep_df, ins_df, variance = 'n_neighbors'):
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Data...")
+    ax = plt.gca()
+    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
+    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
+    plt.clf()
+
+def plot_DT_model():
+
+if __name__ == '__main__':
     print("Initializing Models...")
 
     # runs the Decision Tree
-    # dtRunner = DT.DecisionTree()
-
-    # runs the K-Nearest Neighbor
+    dtRunner = DT.DecisionTree()
+    plot_DT_model()
+    #
+    # # runs the K-Nearest Neighbor
     kNNRunner = KNN.KNearestNeighbor(50)
-    kNNRunner.plot_data()
-    #
-    # runs the Support Vector Machine
-    # SVMRunner = SVM.SupportVectorMachine(kepler_df, insurance_df)
-    #
+    plot_kNN_model(kNNRunner.get_kepler_results(), kNNRunner.get_insurance_results())
+    # # #
+    # # runs the Support Vector Machine
+    # SVMRunner = SVM.SupportVectorMachine()
+    # #
     # runs the Boosting
-    # BoostRunner = BOOST.Boosting()
+    boostModel = BOOST.Boosting(50)
+    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+
+    boostModel = BOOST.Boosting(50, "learning_rate")
+    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
 
     # runs the Neural Network
     # nnRunner = NN.NeuralNetwork()
     #
-    # print(">>>>>>>>>>>>>>>>>>>>>>")
-    # dtRunner.get_results()
-    # print(">>>>>>>>>>>>>>>>>>>>>>")
-    # kNNRunner.get_results()
-    # print(">>>>>>>>>>>>>>>>>>>>>>")
-    # BoostRunner.get_results()
-    # print(">>>>>>>>>>>>>>>>>>>>>>")
-    # nnRunner.get_results()
-    # print(">>>>>>>>>>>>>>>>>>>>>>")
-
-

@@ -70,12 +70,11 @@ class KNearestNeighbor:
         print("[*] KNN- Kepler Data Accuracy: {}".format(self.kepler_accuracy))
         print("[*] KNN- Insurance Data Accuracy: {}".format(self.insurance_accuracy))
 
+    def get_kepler_results(self):
+        return self.kepler_graph_data
 
-    def plot_data(self):
-        print("Plotting Data...")
-        self.kepler_graph_data.plot(kind='line', x='runs', y='accuracy', color='red')
-        self.insurance_data.plot(kind='line', x='runs', y='accuracy', color='blue')
-        plt.savefig('KNN_graph.png')
+    def get_insurance_results(self):
+        return self.insurance_data
 
     def __init__(self, runs = 0):
         print("k-nearest neighbor, using Kepler/Insurance data set")
@@ -90,12 +89,12 @@ class KNearestNeighbor:
             self.kepler_accuracy = self.keplerData(kepler_df, i)
             self.kepler_graph_data.loc[i].runs = i
             self.kepler_graph_data.loc[i].accuracy = self.kepler_accuracy
-            print("[*] KNN- Kepler Data Accuracy: {}".format(self.kepler_accuracy))
+            print(f"[*][{i}] KNN- Kepler Data Accuracy: {self.kepler_accuracy}")
 
             insurance_df = exp_runner.get_insurance_train_test_data()
             self.insurance_accuracy = self.insuranceData(insurance_df, i)
             self.insurance_data.loc[i].runs = i
             self.insurance_data.loc[i].accuracy = self.insurance_accuracy
-            print("[*] KNN- Insurance Data Accuracy: {}".format(self.insurance_accuracy))
+            print(f"[*][{i}] KNN- Insurance Data Accuracy: {self.insurance_accuracy}")
 
 

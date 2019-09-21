@@ -92,11 +92,47 @@ class DecisionTree:
         print("[*] DT - Kepler Data Accuracy: {}".format(self.kepler_accuracy))
         print("[*] DT - Insurance Data Accuracy: {}".format(self.insurance_accuracy))
 
-    def __init__(self):
-        print("Decision Tree, using Kepler/Insurance data set")
-        self.kepler_accuracy = self.keplerData(exp_runner.get_kepler_train_test_data())
-        self.insurance_accuracy = self.insuranceData(exp_runner.get_insurance_train_test_data())
-        self.get_results()
+    def get_kepler_results(self):
+        return self.kepler_graph_data
 
+    def get_insurance_results(self):
+        return self.insurance_data
+
+    def __init__(self, runs = 0, variance = "FILLTHISIN"):
+        print("Decision Tree, using Kepler/Insurance data set")
+        print(f"Runs: {runs}. Using {variance} as the treatment.")
+        self.variance = variance
+        self.kepler_graph_data = pd.DataFrame(columns=['runs', 'accuracy'], index=range(runs))
+        self.insurance_data = pd.DataFrame(columns=['runs', 'accuracy'], index=range(runs))
+
+        # print("Decision Tree, using Kepler/Insurance data set")
+        # self.kepler_accuracy = self.keplerData(exp_runner.get_kepler_train_test_data())
+        # self.insurance_accuracy = self.insuranceData(exp_runner.get_insurance_train_test_data())
+        # self.get_results()
+
+        for i in range(runs):
+            if i == 0:
+                continue
+
+            kepler_df = exp_runner.get_kepler_train_test_data()
+            insurance_df = exp_runner.get_insurance_train_test_data()
+
+            if self.variance == 'FILLTHISIN':
+                self.kepler_accuracy = self.keplerData(kepler_df, i)
+                self.insurance_accuracy = self.insuranceData(insurance_df, i)
+            elif self.variance == 'learning_rate':
+                self.kepler_accuracy = self.keplerData(kepler_df, 50, i)
+                self.insurance_accuracy = self.insuranceData(insurance_df, 50, i)
+            else:
+                print("Not a valid learning parameter")
+                pass
+
+            self.kepler_graph_data.loc[i].runs = i
+            self.kepler_graph_data.loc[i].accuracy = self.kepler_accuracy
+            print(f"[*][{i}] BOOST- Kepler Data Accuracy: {self.kepler_accuracy}")
+
+            self.insurance_data.loc[i].runs = i
+            self.insurance_data.loc[i].accuracy = self.insurance_accuracy
+            print(f"[*][{i}] BOOST- Insurance Data Accuracy: {self.insurance_accuracy}")
 
 
