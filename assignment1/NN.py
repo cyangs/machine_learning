@@ -5,38 +5,16 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.pipeline import Pipeline
 import sklearn.model_selection as ms
 from assignment1 import exp_runner
+import timeit
 
 class NeuralNetwork:
 
-    def testRun(self):
-        return NotImplementedError
-
-    def keplerData(self, kepler_df):
-        # koi_score is output variables (that we need to predict)
-        y = kepler_df['koi_score']
-        X = kepler_df
-        del X['koi_score']  # delete from X we don't need it
-
-        # X = X._get_numeric_data
-        # print(X, y)
-
-        # divide X and y into train and test | train on different data | test on different -> good matrix
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
-
-        mlp = MLPRegressor(hidden_layer_sizes=(13, 13, 13), max_iter=500)
-        mlp.fit(X_train, y_train)
-
-        score = mlp.score(X_test, y_test)
-        print("[*] Accuracy: ", score)
-
-        # not work on continous data that we have as in Kepler
-        # print(confusion_matrix(y_test, predictions))
-        # print(classification_report(y_test, predictions))
-
     def insuranceData(self, insurance_df):
-        y = insurance_df['Destination']
+        logging = {}
+        start_time = timeit.default_timer()
+        y = insurance_df['Claim']
         X = insurance_df
-        del X['Destination']  # delete from X we don't need it
+        del X['Claim']  # delete from X we don't need it
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
@@ -70,10 +48,15 @@ class NeuralNetwork:
         print("[*] Learned parameters: {}".format(params))
         model.fit(X_train, y_train)
 
-        return model.score(X_test, y_test)
+        end_time = timeit.default_timer()
+        logging['training_time'] = end_time - start_time
+        logging['accuracy'] = model.score(X_test, y_test)
+        return logging
 
 
     def kelperDataBetterModel(self, kepler_df):
+        logging = {}
+        start_time = timeit.default_timer()
 
         y = kepler_df['koi_score']
         X = kepler_df
@@ -98,6 +81,7 @@ class NeuralNetwork:
         }
 
         learner = Pipeline([('MLP', MLPRegressor(max_iter=1000))])
+
         gs = ms.GridSearchCV(
             learner,
             params,
@@ -106,6 +90,7 @@ class NeuralNetwork:
             return_train_score=True, verbose=10
         )
 
+        start_time = timeit.default_timer()
         gs.fit(X_train, y_train)
         params = gs.best_params_
 
@@ -113,17 +98,34 @@ class NeuralNetwork:
         model.set_params(**params)
 
         print("[*] Learned parameters: {}".format(params))
-        model.fit(X_train, y_train)
 
-        return model.score(X_test, y_test)
+        model.fit(X_train, y_train)
+        end_time = timeit.default_timer()
+        logging['training_time'] = end_time - start_time
+        logging['accuracy'] = model.score(X_test, y_test)
+        return logging
+
+    def get_kepler_results(self):
+        return self.kepler_logging
+
+    def get_insurance_results(self):
+        return
 
     def get_results(self):
-        print("[*] NN - Kepler Data Accuracy: {}".format(self.kepler_accuracy))
-        print("[*] NN - Insurance Data Accuracy: {}".format(self.insurance_accuracy))
+        print("[*] NN - Kepler Data Accuracy: {}".format(self.kepler_logging.get('accuracy')))
+        print("[*] NN - Kepler Training Time: {}".format(self.kepler_logging.get('training_time')))
+
+        print("[*] NN - Insurance Data Accuracy: {}".format(self.insurance_logging.get('accuracy')))
+        print("[*] NN - Insurance Training Time: {}".format(self.insurance_logging.get('training_time')))
 
     def __init__(self):
         print("Neural Network, using Kepler/Insurance data set")
-        self.kepler_accuracy = self.kelperDataBetterModel(exp_runner.get_kepler_train_test_data())
-        self.insurance_accuracy = self.insuranceData(exp_runner.get_insurance_train_test_data())
+        # self.kepler_graph_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
+        # self.insurance_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
+        kepler_df = exp_runner.get_kepler_train_test_data()
+        insurance_df = exp_runner.get_insurance_train_test_data()
+
+        self.kepler_logging = self.kelperDataBetterModel(kepler_df)
+        self.insurance_logging = self.insuranceData(insurance_df)
         self.get_results()
 

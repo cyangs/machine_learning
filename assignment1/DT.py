@@ -43,9 +43,9 @@ class DecisionTree:
         # X = insurance_df
         # del X['Age']  # delete from X we don't need it
 
-        y = insurance_df['Gender']
+        y = insurance_df['Claim']
         X = insurance_df
-        del X['Gender']  # delete from X we don't need it
+        del X['Claim']  # delete from X we don't need it
 
         # print(X.head())
 
@@ -126,14 +126,14 @@ class DecisionTree:
     def get_insurance_results(self):
         return self.insurance_data
 
-    def __init__(self, runs = 0, variance = "max_depth"):
+    def __init__(self, max_depth = 0, variance = "max_depth"):
         print("Decision Tree, using Kepler/Insurance data set")
-        print(f"Runs: {runs}. Using {variance} as the treatment.")
+        print(f"Runs: {max_depth}. Using {variance} as the treatment.")
         self.variance = variance
-        self.kepler_graph_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
-        self.insurance_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
+        self.kepler_graph_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
+        self.insurance_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
 
-        for i in range(runs):
+        for i in range(max_depth):
             if i == 0:
                 continue
 
@@ -147,14 +147,14 @@ class DecisionTree:
                 print("Not a valid learning parameter")
                 pass
 
-            self.kepler_graph_data.loc[i].runs = i
+            self.kepler_graph_data.loc[i].max_depth = i
             self.kepler_graph_data.loc[i].accuracy = self.kepler_logging.get('accuracy')
             self.kepler_graph_data.loc[i].runtime = self.kepler_logging.get('training_time')
             self.kepler_graph_data.loc[i].precision = self.kepler_logging.get('precision')
             print(f"[*][{i}] DT- Kepler Data Accuracy: {self.kepler_logging.get('accuracy')}")
             print(f"[*][{i}] DT- Kepler Training Runtime: {self.kepler_logging.get('training_time')}")
 
-            self.insurance_data.loc[i].runs = i
+            self.insurance_data.loc[i].max_depth = i
             self.insurance_data.loc[i].accuracy = self.insurance_logging.get('accuracy')
             self.insurance_data.loc[i].runtime = self.insurance_logging.get('training_time')
             self.insurance_data.loc[i].precision = self.insurance_logging.get('precision')

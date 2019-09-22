@@ -13,9 +13,9 @@ class KNearestNeighbor:
 
     def insuranceData(self, insurance_df, n_neighbors = 5, leaf_size = 30, algorithm = 'auto'):
         # Destination is output variables (that we need to predict)
-        y = insurance_df['Gender']
+        y = insurance_df['Claim']
         X = insurance_df
-        del X['Gender']  # delete from X we don't need it
+        del X['Claim']  # delete from X we don't need it
 
         # X = X._get_numeric_data
         # print(X, y)
@@ -86,27 +86,35 @@ class KNearestNeighbor:
     def get_insurance_results(self):
         return self.insurance_data
 
-    def __init__(self, runs = 0):
+    def __init__(self, neighbors):
         print("k-nearest neighbor, using Kepler/Insurance data set")
-        print(f"Runs: {runs}")
-        self.kepler_graph_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
-        self.insurance_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
+        print(f"Runs: {neighbors}")
+        self.kepler_graph_data = pd.DataFrame(columns=['neighbors', 'accuracy', 'runtime'], index=range(neighbors))
+        self.insurance_data = pd.DataFrame(columns=['neighbors', 'accuracy', 'runtime'], index=range(neighbors))
 
-        for i in range(runs):
+        for i in range(neighbors):
             if i == 0:
                 continue
             kepler_df = exp_runner.get_kepler_train_test_data()
-            self.kepler_accuracy, self.kepler_runtime = self.keplerData(kepler_df, i)
-            self.kepler_graph_data.loc[i].runs = i
-            self.kepler_graph_data.loc[i].accuracy = self.kepler_accuracy
-            print(f"[*][{i}] KNN- Kepler Data Accuracy: {self.kepler_accuracy}")
-            print(f"[*][{i}] KNN- Kepler Training Runtime: {self.kepler_runtime}")
-
             insurance_df = exp_runner.get_insurance_train_test_data()
+
+            self.kepler_accuracy, self.kepler_runtime = self.keplerData(kepler_df, i)
+            self.kepler_graph_data.loc[i].neighbors = i
+            self.kepler_graph_data.loc[i].accuracy = self.kepler_accuracy
+            self.kepler_graph_data.loc[i].runtime = self.kepler_runtime
+            print(f"[*][{i}] KNN- :: Kepler Data Accuracy: {self.kepler_accuracy}")
+            print(f"[*][{i}] KNN- :: Kepler Training Runtime: {self.kepler_runtime}")
+
             self.insurance_accuracy, self.insurance_runtime = self.insuranceData(insurance_df, i)
-            self.insurance_data.loc[i].runs = i
+            self.insurance_data.loc[i].neighbors = i
             self.insurance_data.loc[i].accuracy = self.insurance_accuracy
+            self.insurance_data.loc[i].runtime = self.insurance_runtime
             print(f"[*][{i}] KNN- Insurance Data Accuracy: {self.insurance_accuracy}")
             print(f"[*][{i}] KNN- Insurance Training Runtime: {self.insurance_runtime}")
+
+
+
+
+
 
 

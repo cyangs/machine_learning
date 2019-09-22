@@ -52,3 +52,18 @@ I''ve uploaded the two files that I've changed here.
 This classifier problem must be coming in rest of the models,
 so you should use classifier in rest of the files.
 Too, that would give right results (not accurate but right)
+
+
+QUESTIONS:
+1. SVM - How to test different kernels. rbf works fine, I killed linear. 
+2. Implementing cross validation?
+3. Check validation accuracy as well
+5. Validation curve?
+6. How to avoid overfitting?
+7. NN Params? layers/activation functions? What to test? 
+8. confusion matrix.
+
+we need to show both learning curve and model complexity analysis. That's 5 (algorithms) * 2 (datasets) *3 (learning curve + 2 hyper parameters) = 30 graphs. Do we really need 30 graphs in a 10 page report? 
+
+A hyperparameter is just a parameter whose value is set before the learning process, whereas a parameter's value changes during the training process. By that definition, yes, I would say that learning rate is a hyperparameter for boosting
+

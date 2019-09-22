@@ -10,10 +10,13 @@ class Boosting:
         return NotImplementedError
 
     def insuranceData(self, insurance_df, n_estimators = 50, learning_rate = 1):
-        y = insurance_df['Gender']
+        y = insurance_df['Claim']
         X = insurance_df
-        del X['Gender']  # delete from X we don't need it
+        del X['Claim']  # delete from X we don't need it
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+        # classifier = AdaBoostClassifier(base_estimator=tree.DecisionTreeClassifier(),
+        #                                 n_estimators=(n_estimators + 1) * 10)
 
         classifier = ensemble.AdaBoostClassifier(
             base_estimator=None,
@@ -62,9 +65,6 @@ class Boosting:
         end_time = timeit.default_timer()
         logging['training_time'] = end_time - start_time
         logging['accuracy'] = boost_model.score(X_test, y_test)
-
-        # Model Accuracy, how often is the classifier correct?
-        accuracy = boost_model.score(X_test, y_test)
         return logging
 
     def get_results(self):
@@ -77,14 +77,14 @@ class Boosting:
     def get_insurance_results(self):
         return self.insurance_data
 
-    def __init__(self,  runs = 0, variance = "n_estimators"):
+    def __init__(self,  estimators = 0, variance = "n_estimators"):
         print("Boost, using Kepler/Insurance data set")
-        print(f"Runs: {runs}. Using {variance} as the treatment.")
+        print(f"Estimators: {estimators}. Using {variance} as the treatment.")
         self.variance = variance
-        self.kepler_graph_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
-        self.insurance_data = pd.DataFrame(columns=['runs', 'accuracy', 'runtime'], index=range(runs))
+        self.kepler_graph_data = pd.DataFrame(columns=['estimators', 'accuracy', 'runtime'], index=range(estimators))
+        self.insurance_data = pd.DataFrame(columns=['estimators', 'accuracy', 'runtime'], index=range(estimators))
 
-        for i in range(runs):
+        for i in range(estimators):
             if i == 0:
                 continue
 
@@ -101,13 +101,15 @@ class Boosting:
                 print("Not a valid learning parameter")
                 pass
 
-            self.kepler_graph_data.loc[i].runs = i
+            self.kepler_graph_data.loc[i].estimators = i
             self.kepler_graph_data.loc[i].accuracy = self.kepler_logging.get('accuracy')
             self.kepler_graph_data.loc[i].runtime = self.kepler_logging.get('training_time')
             print(f"[*][{i}] BOOST- Kepler Data Accuracy: {self.kepler_logging.get('accuracy')}")
+            print(f"[*][{i}] BOOST- Kepler Training Runtime: {self.kepler_logging.get('training_time')}")
 
-            self.insurance_data.loc[i].runs = i
+            self.insurance_data.loc[i].estimators = i
             self.insurance_data.loc[i].accuracy = self.insurance_logging.get('accuracy')
             self.insurance_data.loc[i].runtime = self.insurance_logging.get('training_time')
             print(f"[*][{i}] BOOST- Insurance Data Accuracy: {self.insurance_logging.get('accuracy')}")
+            print(f"[*][{i}] BOOST- Insurance Training Runtime: {self.insurance_logging.get('training_time')}")
 

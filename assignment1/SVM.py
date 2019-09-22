@@ -13,9 +13,9 @@ class SupportVectorMachine:
 
     def insuranceData(self, insurance_df, kernel):
         # Destination is output variables (that we need to predict)
-        y = insurance_df['Gender']
+        y = insurance_df['Claim']
         X = insurance_df
-        del X['Gender']  # delete from X we don't need it
+        del X['Claim']  # delete from X we don't need it
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
@@ -32,6 +32,7 @@ class SupportVectorMachine:
         model.fit(X_train, y_train)
         end_time = timeit.default_timer()
         accuracy = model.score(X_test, y_test)
+
         logging['training_time'] = end_time - start_time
         logging['accuracy'] = accuracy
         return logging
@@ -60,6 +61,7 @@ class SupportVectorMachine:
         model.fit(X_train, y_train)
         end_time = timeit.default_timer()
         accuracy = model.score(X_test, y_test)
+
         logging['training_time'] = end_time - start_time
         logging['accuracy'] = accuracy
         return logging
@@ -71,13 +73,16 @@ class SupportVectorMachine:
     def get_insurance_results(self):
         return self.insurance_data
 
-    def __init__(self, variance = 'kernel'):
-        print(f"Support Vector Machine, using {variance} and Kepler/Insurance data set")
-        kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+    def __init__(self):
+        print(f"Support Vector Machine: Kepler/Insurance data set")
+        kernels = ['rbf', 'poly', 'sigmoid', 'linear']
         self.kepler_graph_data = pd.DataFrame(columns=['kernel', 'accuracy', 'runtime'], index=kernels)
         self.insurance_data = pd.DataFrame(columns=['kernel', 'accuracy', 'runtime'], index=kernels)
 
+        kernals = ['rbf']
+
         for kernel in kernels:
+            print(f"Starting {kernel}...")
             kepler_df = exp_runner.get_kepler_train_test_data()
             insurance_df = exp_runner.get_insurance_train_test_data()
 

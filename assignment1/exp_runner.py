@@ -84,41 +84,76 @@ def get_insurance_train_test_data():
     return df_copy
 
 
-def plot_boost_model(kep_df, ins_df, variance = 'n_estimators'):
+def plot_boost_model(kep_df, ins_df, variance = 'n_estimators', runtime = True):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
     ax = plt.gca()
-    plt.title("Boosting")
-    plt.xlabel("Number of Runs")
+    plt.title(f"Boosting ({variance} vs Accuracy)")
+    plt.xlabel(f"Number of {variance}")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
-    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    kep_df.plot(kind='line', x='estimators', y='accuracy', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='estimators', y='accuracy', color='blue', ax=ax, label="Insurance")
     plt.savefig(f'./output/BOOST_graph_{variance}_{timestamp}.png')
+    plt.clf()
+
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Runtime Data...")
+    ax = plt.gca()
+    plt.title("Boosting (n Estimators vs Runtime)")
+    plt.xlabel("Number of Estimators")
+    plt.ylabel("Runtime (sec)")
+    kep_df.plot(kind='line', x='estimators', y='runtime', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='estimators', y='runtime', color='blue', ax=ax, label="Insurance")
+    plt.savefig(f'./output/BOOST_graph_RUNTIME_{timestamp}.png')
     plt.clf()
 
 def plot_kNN_model(kep_df, ins_df, variance = 'n_neighbors'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    print("Plotting Data...")
+    print("Plotting Accuracy Data...")
     ax = plt.gca()
-    plt.title("k-Nearest Neighbor")
-    plt.xlabel("Number of Runs")
+    plt.title("k-Nearest Neighbor (k Neighbors vs Runtime)")
+    plt.xlabel("k Neighbors")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
-    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    kep_df.plot(kind='line', x='neighbors', y='accuracy', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='neighbors', y='accuracy', color='blue', ax=ax, label="Insurance")
     plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
     plt.clf()
+
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Runtime Data...")
+    ax = plt.gca()
+    plt.title("k-Nearest Neighbor (k Neighbors vs Runtime)")
+    plt.xlabel("k Neighbors")
+    plt.ylabel("Runtime (sec)")
+    kep_df.plot(kind='line', x='neighbors', y='runtime', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='neighbors', y='runtime', color='blue', ax=ax, label="Insurance")
+    plt.savefig(f'./output/KNN_graph_RUNTIME_{timestamp}.png')
+    plt.clf()
+
 
 def plot_DT_model(kep_df, ins_df, variance = 'max_depth'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
     ax = plt.gca()
-    plt.title("Decision Tree")
-    plt.xlabel("Number of Runs")
+    plt.title("Decision Tree (Max Depth vs. Accuracy)")
+    plt.xlabel("Max Depth")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='runs', y='accuracy', color='red', ax=ax)
-    ins_df.plot(kind='line', x='runs', y='accuracy', color='blue', ax=ax)
+    kep_df.plot(kind='line', x='max_depth', y='accuracy', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='max_depth', y='accuracy', color='blue', ax=ax, label="Insurance")
     plt.savefig(f'./output/DT_graph_{variance}_{timestamp}.png')
     plt.clf()
+
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Runtime Data...")
+    ax = plt.gca()
+    plt.title("Decision Tree (Max Depth vs. Runtime)")
+    plt.xlabel(variance)
+    plt.ylabel("Runtime (sec)")
+    kep_df.plot(kind='line', x='max_depth', y='runtime', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='max_depth', y='runtime', color='blue', ax=ax, label="Insurance")
+    plt.savefig(f'./output/DT_graph_RUNTIME_{timestamp}.png')
+    plt.clf()
+
 
 def plot_SVM_model(df, dataname):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -133,30 +168,38 @@ def plot_SVM_model(df, dataname):
 
 
 if __name__ == '__main__':
+    # user_input = input("Run which model?")
     print("Initializing Models...")
 
     # runs the Decision Tree
-    # dtRunner = DT.DecisionTree(30)
+    # dtRunner = DT.DecisionTree(40)
     # plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
     # #
     # # # runs the K-Nearest Neighbor
-    # kNNRunner = KNN.KNearestNeighbor(50)
+    # kNNRunner = KNN.KNearestNeighbor(70)
     # plot_kNN_model(kNNRunner.get_kepler_results(), kNNRunner.get_insurance_results())
-    # # # # #
+    # # # #
     # runs the Support Vector Machine
-    SVMRunner = SVM.SupportVectorMachine()
-    plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
-    plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
+    # SVMRunner = SVM.SupportVectorMachine()
+    # plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
+    # plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
 
     # # # #
     # # # runs the Boosting
-    # boostModel = BOOST.Boosting(50)
+    # boostModel = BOOST.Boosting(300)
     # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
     #
-    # boostModel = BOOST.Boosting(50, 'learning_rate')
-    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+    boostModel = BOOST.Boosting(50, 'learning_rate')
+    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results(), 'learning_rate', False)
 
 
     # runs the Neural Network
     # nnRunner = NN.NeuralNetwork()
     #
+
+    # [Parallel(n_jobs=2)]: Done 336 out of 336 | elapsed: 69.0min finished
+    # [*] Learned parameters: {'MLP__activation': 'identity', 'MLP__alpha': 4.0, 'MLP__hidden_layer_sizes': (64,), 'MLP__random_state': 1, 'MLP__solver': 'lbfgs'}
+    # [*] NN - Kepler Data Accuracy: 0.028935758890765717
+    # [*] NN - Kepler Training Time: 737.944311378
+    # [*] NN - Insurance Data Accuracy: 0.032214468286650644
+    # [*] NN - Insurance Training Time: 4174.011079383
