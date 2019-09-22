@@ -44,14 +44,14 @@ class SupportVectorMachine:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
-        model = SVC(kernel=kernel,
-                    degree=3,
-                    gamma="auto_deprecated",
-                    coef0=0.0, tol=0.001, C=1.0,
-                    shrinking=True,
-                    cache_size=200, verbose=False,
-                    max_iter=-1)
-
+        # model = SVC(kernel=kernel,
+        #             degree=3,
+        #             gamma="auto_deprecated",
+        #             coef0=0.0, tol=0.001, C=1.0,
+        #             shrinking=True,
+        #             cache_size=200, verbose=False,
+        #             max_iter=-1)
+        model = SVC(kernel=kernel)
 
         start_time = timeit.default_timer()
         model.fit(X_train, y_train)
@@ -102,13 +102,15 @@ class SupportVectorMachine:
         ## Try varying C, Gamma, and Epsilon
         ## TRY SK LEARN LinearSVC
 
-        model = SVR(kernel=kernel,
-                    degree=3,
-                    gamma="auto_deprecated",
-                    coef0=0.0, tol=0.001, C=1.0,
-                    epsilon=0.1, shrinking=True,
-                    cache_size=200, verbose=False,
-                    max_iter=-1)
+        # model = SVR(kernel=kernel,
+        #             degree=3,
+        #             gamma="auto_deprecated",
+        #             coef0=0.0, tol=0.001, C=1.0,
+        #             epsilon=0.1, shrinking=True,
+        #             cache_size=200, verbose=False,
+        #             max_iter=-1)
+
+        model = SVR(kernel=kernel)
 
         start_time = timeit.default_timer()
         model.fit(X_train, y_train)
@@ -132,7 +134,7 @@ class SupportVectorMachine:
         self.kepler_graph_data = pd.DataFrame(columns=['kernel', 'accuracy'], index=kernels)
         self.insurance_data = pd.DataFrame(columns=['kernel', 'accuracy'], index=kernels)
 
-        kernels = ['rbf', 'linear']
+        kernels = ['rbf', 'linear', 'sigmoid']
 
         for kernel in kernels:
             print(f"Starting {kernel}...")

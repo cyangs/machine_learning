@@ -206,6 +206,59 @@ class DataLoader(ABC):
             logger.info(msg.format(*args))
 
 
+class Kepler(DataLoader):
+
+    def __init__(self, path='data/kepler.csv', verbose=False, seed=1):
+        super().__init__(path, verbose, seed)
+
+    def _load_data(self):
+        self._data = pd.read_csv("../data/kepler.csv")
+
+    def data_name(self):
+        return 'Kepler'
+
+    def class_column_name(self):
+        return 'Kepler Exoplanet'
+
+    def _preprocess_data(self):
+        non_floats = []
+
+        koi_disposition = {
+            'koi_disposition': {
+                'CONFIRMED': 0,
+                'FALSE POSITIVE': 1,
+                'CANDIDATE': 2
+            }
+        }
+
+        self._data.replace(koi_disposition, inplace=True)
+        self._data['koi_disposition'] = self._data['koi_disposition'].astype(np.float64)
+
+        # drop all columns who are not float
+        for col in self._data:
+            if self._data[col].dtypes != "float64":
+                non_floats.append(col)
+
+        self._data = self._data.drop(columns=non_floats)
+
+        # replace all NaN with 0
+        self._data = self._data.fillna(0)
+
+        # X = X._get_numeric_data
+        # print(X, y)
+
+        return self._data
+
+    def pre_training_adjustment(self, train_features, train_classes):
+        """
+        Perform any adjustments to training data before training begins.
+        :param train_features: The training features to adjust
+        :param train_classes: The training classes to adjust
+        :return: The processed data
+        """
+        return train_features, train_classes
+
+
 class CreditDefaultData(DataLoader):
 
     def __init__(self, path='data/default of credit card clients.xls', verbose=False, seed=1):
@@ -377,8 +430,11 @@ class StatlogVehicleData(DataLoader):
 
 
 if __name__ == '__main__':
-    cd_data = CreditDefaultData(verbose=True)
+    cd_data = Kepler(verbose=True)
     cd_data.load_and_process()
 
-    ca_data = CreditApprovalData(verbose=True)
-    ca_data.load_and_process()
+    # cd_data = CreditDefaultData(verbose=True)
+    # cd_data.load_and_process()
+    #
+    # ca_data = CreditApprovalData(verbose=True)
+    # ca_data.load_and_process()

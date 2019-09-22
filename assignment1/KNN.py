@@ -94,8 +94,8 @@ class KNearestNeighbor:
     def __init__(self, neighbors):
         print("k-nearest neighbor, using Kepler/Insurance data set")
         print(f"Runs: {neighbors}")
-        self.kepler_graph_data = pd.DataFrame(columns=['neighbors', 'accuracy', 'runtime'], index=range(neighbors))
-        self.insurance_data = pd.DataFrame(columns=['neighbors', 'accuracy', 'runtime'], index=range(neighbors))
+        self.kepler_graph_data = pd.DataFrame(columns=['neighbors', 'cross_val', 'accuracy', 'runtime'], index=range(neighbors))
+        self.insurance_data = pd.DataFrame(columns=['neighbors', 'cross_val', 'accuracy', 'runtime'], index=range(neighbors))
 
         for i in range(neighbors):
             if i == 0:
@@ -112,7 +112,7 @@ class KNearestNeighbor:
             print(f"[*][{i}] KNN- :: Kepler Cross Validation: {self.kepler_cross_val}")
             print(f"[*][{i}] KNN- :: Kepler Training Runtime: {self.kepler_runtime}")
 
-            self.insurance_accuracy, self.insurance_runtime, self.kepler_cross_val = self.insuranceData(insurance_df, i)
+            self.insurance_accuracy, self.insurance_runtime, self.insurance_cross_val = self.insuranceData(insurance_df, i)
             self.insurance_data.loc[i].neighbors = i
             self.insurance_data.loc[i].accuracy = self.insurance_accuracy
             self.insurance_data.loc[i].runtime = self.insurance_runtime

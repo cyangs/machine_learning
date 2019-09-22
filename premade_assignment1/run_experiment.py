@@ -44,17 +44,22 @@ if __name__ == '__main__':
 
     print("Loading data")
     print("----------")
-
     ds1_details = {
-            'data': loader.CreditDefaultData(verbose=verbose, seed=seed),
-            'name': 'credit_default',
-            'readable_name': 'Credit Default',
+            'data': loader.Kepler(verbose=verbose, seed=seed),
+            'name': 'Kepler',
+            'readable_name': 'Kepler',
         }
-    ds2_details = {
-            'data': loader.PenDigitData(verbose=verbose, seed=seed),
-            'name': 'pen_digits',
-            'readable_name': 'Handwritten Digits',
-        }
+
+    # ds1_details = {
+    #         'data': loader.CreditDefaultData(verbose=verbose, seed=seed),
+    #         'name': 'credit_default',
+    #         'readable_name': 'Credit Default',
+    #     }
+    # ds2_details = {
+    #         'data': loader.PenDigitData(verbose=verbose, seed=seed),
+    #         'name': 'pen_digits',
+    #         'readable_name': 'Handwritten Digits',
+    #     }
 
     if verbose:
         print("----------")
@@ -64,7 +69,7 @@ if __name__ == '__main__':
 
     datasets = [
         ds1_details,
-        ds2_details
+        # ds2_details
     ]
 
     experiment_details = []

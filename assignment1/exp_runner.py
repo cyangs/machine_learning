@@ -129,23 +129,23 @@ def plot_kNN_model(kep_df, ins_df, variance = 'n_neighbors'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Accuracy Data...")
     ax = plt.gca()
-    plt.title("k-Nearest Neighbor (k Neighbors vs Runtime)")
+    plt.title("Kepler k-Nearest Neighbor (k Neighbors vs Accuracy)")
     plt.xlabel("k Neighbors")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='neighbors', y='accuracy', color='red', ax=ax, label="Kepler")
-    ins_df.plot(kind='line', x='neighbors', y='accuracy', color='blue', ax=ax, label="Insurance")
-    plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
+    kep_df.plot(kind='line', x='neighbors', y='cross_val', color='red', ax=ax, label="Cross Validation")
+    kep_df.plot(kind='line', x='neighbors', y='accuracy', color='blue', ax=ax, label="Accuracy")
+    plt.savefig(f'./output/KNN_graph_KEPLER_{timestamp}.png')
     plt.clf()
 
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Accuracy Data...")
     ax = plt.gca()
-    plt.title("k-Nearest Neighbor (k Neighbors vs Runtime)")
+    plt.title("Insurance k-Nearest Neighbor (k Neighbors vs Runtime)")
     plt.xlabel("k Neighbors")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='neighbors', y='accuracy', color='red', ax=ax, label="Kepler")
+    kep_df.plot(kind='line', x='neighbors', y='cross_val', color='red', ax=ax, label="Cross Validation")
     ins_df.plot(kind='line', x='neighbors', y='accuracy', color='blue', ax=ax, label="Insurance")
-    plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
+    plt.savefig(f'./output/KNN_graph_INSURANCE_{timestamp}.png')
     plt.clf()
 
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -201,7 +201,7 @@ def plot_SVM_model(df, dataname):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
 
-    plt.title("Support Vector Machine")
+    plt.title(f"Support Vector Machine - {dataname} (Kernel vs Accuracy)")
     df.plot.bar(rot=0)
     plt.xlabel("Kernels")
     plt.ylabel("Accuracy")
@@ -214,8 +214,8 @@ if __name__ == '__main__':
     print("Initializing Models...")
 
     # runs the Decision Tree
-    dtRunner = DT.DecisionTree(40)
-    plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
+    # dtRunner = DT.DecisionTree(40)
+    # plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
 
 
     # # # runs the K-Nearest Neighbor
@@ -225,9 +225,9 @@ if __name__ == '__main__':
     # # # #
     # runs the Support Vector Machine
 
-    # SVMRunner = SVM.SupportVectorMachine()
-    # plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
-    # plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
+    SVMRunner = SVM.SupportVectorMachine()
+    plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
+    plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
 
     # # # #
     # # # runs the Boosting
