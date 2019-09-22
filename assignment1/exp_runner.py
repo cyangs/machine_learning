@@ -4,10 +4,13 @@ from assignment1 import SVM
 from assignment1 import BOOST
 from assignment1 import NN
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 import pandas as pd
 import numpy as np
 import datetime
 import matplotlib.pyplot as plt
+import seaborn as sn
+
 
 def get_kepler_train_test_data():
     df = pd.read_csv("../data/kepler.csv")
@@ -69,6 +72,8 @@ def get_kepler_train_test_data():
 #     df_copy = df_copy.fillna(0)
 #
 #     return df_copy
+def plot_confusion_matrix(y_test, y_pred):
+    cm = confusion_matrix(y_test, y_pred)
 
 
 def get_insurance_train_test_data():
@@ -84,23 +89,36 @@ def get_insurance_train_test_data():
     return df_copy
 
 
-def plot_boost_model(kep_df, ins_df, variance = 'n_estimators', runtime = True):
+def plot_boost_model(kep_df, ins_df, variance = 'n_estimators'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    print("Plotting Data...")
+    print("Plotting Kepler Data...")
     ax = plt.gca()
-    plt.title(f"Boosting ({variance} vs Accuracy)")
+    ax.set_ylim([0, 1])
+    plt.title(f"Kepler AdaBoost ({variance} vs Accuracy)")
     plt.xlabel(f"Number of {variance}")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='estimators', y='accuracy', color='red', ax=ax, label="Kepler")
+    kep_df.plot(kind='line', x='estimators', y='cross_val', color='blue', ax=ax, label="Cross Validation")
+    kep_df.plot(kind='line', x='estimators', y='accuracy', color='red', ax=ax, label="Accuracy")
+    plt.savefig(f'./output/BOOST_graph_KEPLER_{variance}_{timestamp}.png')
+    plt.clf()
+
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Insurance Data...")
+    ax = plt.gca()
+    ax.set_ylim([0, 1])
+    plt.title(f"Insurance AdaBoost ({variance} vs Accuracy)")
+    plt.xlabel(f"Number of {variance}")
+    plt.ylabel("Accuracy")
+    ins_df.plot(kind='line', x='estimators', y='cross_val', color='red', ax=ax, label="Cross Validation")
     ins_df.plot(kind='line', x='estimators', y='accuracy', color='blue', ax=ax, label="Insurance")
-    plt.savefig(f'./output/BOOST_graph_{variance}_{timestamp}.png')
+    plt.savefig(f'./output/BOOST_graph_INSURANCE_{variance}_{timestamp}.png')
     plt.clf()
 
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Runtime Data...")
     ax = plt.gca()
-    plt.title("Boosting (n Estimators vs Runtime)")
-    plt.xlabel("Number of Estimators")
+    plt.title(f"Boosting ({variance} vs Runtime)")
+    plt.xlabel(f"Number of {variance}")
     plt.ylabel("Runtime (sec)")
     kep_df.plot(kind='line', x='estimators', y='runtime', color='red', ax=ax, label="Kepler")
     ins_df.plot(kind='line', x='estimators', y='runtime', color='blue', ax=ax, label="Insurance")
@@ -108,6 +126,17 @@ def plot_boost_model(kep_df, ins_df, variance = 'n_estimators', runtime = True):
     plt.clf()
 
 def plot_kNN_model(kep_df, ins_df, variance = 'n_neighbors'):
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Accuracy Data...")
+    ax = plt.gca()
+    plt.title("k-Nearest Neighbor (k Neighbors vs Runtime)")
+    plt.xlabel("k Neighbors")
+    plt.ylabel("Accuracy")
+    kep_df.plot(kind='line', x='neighbors', y='accuracy', color='red', ax=ax, label="Kepler")
+    ins_df.plot(kind='line', x='neighbors', y='accuracy', color='blue', ax=ax, label="Insurance")
+    plt.savefig(f'./output/KNN_graph_{variance}_{timestamp}.png')
+    plt.clf()
+
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Accuracy Data...")
     ax = plt.gca()
@@ -135,12 +164,25 @@ def plot_DT_model(kep_df, ins_df, variance = 'max_depth'):
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     print("Plotting Data...")
     ax = plt.gca()
-    plt.title("Decision Tree (Max Depth vs. Accuracy)")
-    plt.xlabel("Max Depth")
+    ax.set_ylim([0, 1])
+    plt.title(f"Kepler Decision Tree ({variance} vs. Accuracy)")
+    plt.xlabel(f"{variance}")
     plt.ylabel("Accuracy")
-    kep_df.plot(kind='line', x='max_depth', y='accuracy', color='red', ax=ax, label="Kepler")
-    ins_df.plot(kind='line', x='max_depth', y='accuracy', color='blue', ax=ax, label="Insurance")
-    plt.savefig(f'./output/DT_graph_{variance}_{timestamp}.png')
+    kep_df.plot(kind='line', x='max_depth', y='cross_val', color='red', ax=ax, label="Cross Validation")
+    kep_df.plot(kind='line', x='max_depth', y='accuracy', color='blue', ax=ax, label="Accuracy")
+    plt.savefig(f'./output/DT_KEPLER_graph_{variance}_{timestamp}.png')
+    plt.clf()
+
+    timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    print("Plotting Data...")
+    ax = plt.gca()
+    ax.set_ylim([0, 1])
+    plt.title(f"Insurance Decision Tree ({variance} vs. Accuracy)")
+    plt.xlabel(f"{variance}")
+    plt.ylabel("Accuracy")
+    ins_df.plot(kind='line', x='max_depth', y='cross_val', color='red', ax=ax, label="Cross Validation")
+    ins_df.plot(kind='line', x='max_depth', y='accuracy', color='blue', ax=ax, label="Accuracy")
+    plt.savefig(f'./output/DT_INSURANCE_graph_{variance}_{timestamp}.png')
     plt.clf()
 
     timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -172,14 +214,17 @@ if __name__ == '__main__':
     print("Initializing Models...")
 
     # runs the Decision Tree
-    # dtRunner = DT.DecisionTree(40)
-    # plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
-    # #
+    dtRunner = DT.DecisionTree(40)
+    plot_DT_model(dtRunner.get_kepler_results(), dtRunner.get_insurance_results())
+
+
     # # # runs the K-Nearest Neighbor
     # kNNRunner = KNN.KNearestNeighbor(70)
     # plot_kNN_model(kNNRunner.get_kepler_results(), kNNRunner.get_insurance_results())
+
     # # # #
     # runs the Support Vector Machine
+
     # SVMRunner = SVM.SupportVectorMachine()
     # plot_SVM_model(SVMRunner.get_kepler_results(), 'Kepler')
     # plot_SVM_model(SVMRunner.get_insurance_results(), 'Insurance')
@@ -187,12 +232,13 @@ if __name__ == '__main__':
     # # # #
     # # # runs the Boosting
     # boostModel = BOOST.Boosting(300)
-    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results())
+    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results(), 'n Estimators')
+    # #
+    # boostModel = BOOST.Boosting(50, 'learning_rate')
+    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results(), 'learning_rate')
     #
-    boostModel = BOOST.Boosting(50, 'learning_rate')
-    plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results(), 'learning_rate', False)
-
-
+    # boostModel = BOOST.Boosting(100, 'maximum_depth')
+    # plot_boost_model(boostModel.get_kepler_results(), boostModel.get_insurance_results(), 'Max Depth')
     # runs the Neural Network
     # nnRunner = NN.NeuralNetwork()
     #

@@ -67,3 +67,9 @@ we need to show both learning curve and model complexity analysis. That's 5 (alg
 
 A hyperparameter is just a parameter whose value is set before the learning process, whereas a parameter's value changes during the training process. By that definition, yes, I would say that learning rate is a hyperparameter for boosting
 
+Increase n_jobs as to how many cores your PC have, to fast the process.
+Look into CV, it'll help later on.
+Rest other are fine.
+Give your model in place of ridge()
+This should be enough.
+

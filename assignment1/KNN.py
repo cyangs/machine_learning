@@ -4,7 +4,8 @@ from assignment1 import exp_runner
 import pandas as pd
 import matplotlib.pyplot as plt
 import timeit
-
+from sklearn.model_selection import cross_val_score
+import numpy as np
 
 class KNearestNeighbor:
 
@@ -38,8 +39,10 @@ class KNearestNeighbor:
         end_time = timeit.default_timer()
         training_time = end_time - start_time
 
+        cross_val = cross_val_score(model, X, y, cv=3)
+        avg_score = np.mean(cross_val)
         accuracy = model.score(X_test, y_test)
-        return accuracy, training_time
+        return accuracy, training_time, avg_score
 
 
     def keplerData(self, kepler_df, n_neighbors = 5, leaf_size = 30, algorithm = 'auto'):
@@ -73,8 +76,10 @@ class KNearestNeighbor:
         training_time = end_time - start_time
 
         # accuracy
+        cross_val = cross_val_score(model, X, y, cv=3)
+        avg_score = np.mean(cross_val)
         accuracy = model.score(X_test, y_test)
-        return accuracy, training_time
+        return accuracy, training_time, avg_score
 
     def get_results(self):
         print("[*] KNN- Kepler Data Accuracy: {}".format(self.kepler_accuracy))
@@ -98,18 +103,23 @@ class KNearestNeighbor:
             kepler_df = exp_runner.get_kepler_train_test_data()
             insurance_df = exp_runner.get_insurance_train_test_data()
 
-            self.kepler_accuracy, self.kepler_runtime = self.keplerData(kepler_df, i)
+            self.kepler_accuracy, self.kepler_runtime, self.kepler_cross_val = self.keplerData(kepler_df, i)
             self.kepler_graph_data.loc[i].neighbors = i
             self.kepler_graph_data.loc[i].accuracy = self.kepler_accuracy
             self.kepler_graph_data.loc[i].runtime = self.kepler_runtime
+            self.kepler_graph_data.loc[i].cross_val = self.kepler_cross_val
             print(f"[*][{i}] KNN- :: Kepler Data Accuracy: {self.kepler_accuracy}")
+            print(f"[*][{i}] KNN- :: Kepler Cross Validation: {self.kepler_cross_val}")
             print(f"[*][{i}] KNN- :: Kepler Training Runtime: {self.kepler_runtime}")
 
-            self.insurance_accuracy, self.insurance_runtime = self.insuranceData(insurance_df, i)
+            self.insurance_accuracy, self.insurance_runtime, self.kepler_cross_val = self.insuranceData(insurance_df, i)
             self.insurance_data.loc[i].neighbors = i
             self.insurance_data.loc[i].accuracy = self.insurance_accuracy
             self.insurance_data.loc[i].runtime = self.insurance_runtime
+            self.insurance_data.loc[i].cross_val = self.insurance_cross_val
+
             print(f"[*][{i}] KNN- Insurance Data Accuracy: {self.insurance_accuracy}")
+            print(f"[*][{i}] KNN- Insurance Cross Validation: {self.insurance_cross_val}")
             print(f"[*][{i}] KNN- Insurance Training Runtime: {self.insurance_runtime}")
 
 

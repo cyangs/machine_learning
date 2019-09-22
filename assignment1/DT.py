@@ -5,8 +5,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
 from sklearn import tree
 from sklearn.model_selection import train_test_split
-
-from sklearn.metrics import roc_auc_score, accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
+from sklearn.model_selection import cross_val_score
+import numpy as np
 
 import timeit
 
@@ -47,6 +47,8 @@ class DecisionTree:
         X = insurance_df
         del X['Claim']  # delete from X we don't need it
 
+
+
         # print(X.head())
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
@@ -69,14 +71,26 @@ class DecisionTree:
         #     min_impurity_split=None, init=None, random_state=None, max_features=None,
         #     verbose=1, n_iter_no_change=None, tol=0.0001)
 
+        # cm = confusion_matrix(y_test, y_pred)
+        # print(cm)
+
+        # tscores, vscores = validation_curve(model, X, y, "alpha", np.logspace(-7, 3, 3), cv=5)
+        # print(tscores, vscores)
+
+
         # training
         logging = {}
 
         start_time = timeit.default_timer()
         model.fit(X_train, y_train)
         end_time = timeit.default_timer()
+        cross_val = cross_val_score(model, X, y, cv=3)
+        avg_score = np.mean(cross_val)
+
+
         logging['training_time'] = end_time - start_time
         logging['accuracy'] = model.score(X_test, y_test)
+        logging['cross_val'] = avg_score
 
         # y_pred = model.predict(X_test)
         # logging['precision'] = precision_score(y_test, y_pred, average=None)
@@ -112,6 +126,10 @@ class DecisionTree:
         start_time = timeit.default_timer()
         model.fit(X_train, y_train)
         end_time = timeit.default_timer()
+        cross_val = cross_val_score(model, X, y, cv=3)
+        avg_score = np.mean(cross_val)
+
+        logging['cross_val'] = avg_score
         logging['training_time'] = end_time - start_time
         logging['accuracy'] = model.score(X_test, y_test)
         return logging
@@ -130,8 +148,8 @@ class DecisionTree:
         print("Decision Tree, using Kepler/Insurance data set")
         print(f"Runs: {max_depth}. Using {variance} as the treatment.")
         self.variance = variance
-        self.kepler_graph_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
-        self.insurance_data = pd.DataFrame(columns=['max_depth', 'accuracy', 'runtime'], index=range(max_depth))
+        self.kepler_graph_data = pd.DataFrame(columns=['max_depth', 'cross_val', 'accuracy', 'runtime'], index=range(max_depth))
+        self.insurance_data = pd.DataFrame(columns=['max_depth', 'cross_val', 'accuracy', 'runtime'], index=range(max_depth))
 
         for i in range(max_depth):
             if i == 0:
@@ -150,16 +168,17 @@ class DecisionTree:
             self.kepler_graph_data.loc[i].max_depth = i
             self.kepler_graph_data.loc[i].accuracy = self.kepler_logging.get('accuracy')
             self.kepler_graph_data.loc[i].runtime = self.kepler_logging.get('training_time')
-            self.kepler_graph_data.loc[i].precision = self.kepler_logging.get('precision')
+            self.kepler_graph_data.loc[i].cross_val = self.kepler_logging.get('cross_val')
             print(f"[*][{i}] DT- Kepler Data Accuracy: {self.kepler_logging.get('accuracy')}")
+            print(f"[*][{i}] DT- Kepler Cross Validation: {self.kepler_logging.get('cross_val')}")
             print(f"[*][{i}] DT- Kepler Training Runtime: {self.kepler_logging.get('training_time')}")
 
             self.insurance_data.loc[i].max_depth = i
             self.insurance_data.loc[i].accuracy = self.insurance_logging.get('accuracy')
             self.insurance_data.loc[i].runtime = self.insurance_logging.get('training_time')
-            self.insurance_data.loc[i].precision = self.insurance_logging.get('precision')
+            self.insurance_data.loc[i].cross_val = self.insurance_logging.get('cross_val')
             print(f"[*][{i}] DT- Insurance Data Accuracy: {self.insurance_logging.get('accuracy')}")
-            print(f"[*][{i}] DT- Insurance Data Precision: {self.insurance_logging.get('precision')}")
+            print(f"[*][{i}] DT- Insurance Cross Validation: {self.insurance_logging.get('cross_val')}")
             print(f"[*][{i}] DT- Insurance Training Runtime: {self.insurance_logging.get('training_time')}")
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
